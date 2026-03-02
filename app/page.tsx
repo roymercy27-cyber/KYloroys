@@ -82,7 +82,7 @@ export default function Dashboard() {
                 <th class="px-5 py-3 text-left">Parent Name</th>
                 <th class="px-5 py-3 text-left">Phone</th>
                 <th class="px-5 py-3 text-left">Grade</th>
-                <th class="px-5 py-3 text-left">Parent Message (Cleaned)</th>
+                <th class="px-5 py-3 text-left">Parent Message</th>
               </tr>
             </thead>
             <tbody id="leads-body" class="divide-y divide-slate-100"></tbody>
@@ -120,36 +120,41 @@ export default function Dashboard() {
             records.forEach(r => {
                 const f = r.fields;
                 
-                // --- ROBUST CLEANER LOGIC ---
-                let summaryDisplay = "No transcript available.";
-                let rawSummary = (f['Call Summary'] || '').trim();
+                // --- SMART MESSAGE CLEANER ---
+                let summaryDisplay = "No messages from parent.";
+                let rawData = (f['Call Summary'] || '').trim();
 
-                if (rawSummary.includes('"role"')) {
+                // If data looks like a JSON array of messages
+                if (rawData.includes('"role"')) {
                   try {
-                    // Wrap in brackets if they are missing
-                    if (!rawSummary.startsWith('[')) {
-                      rawSummary = '[' + rawSummary + ']';
+                    // Normalize JSON
+                    if (!rawData.startsWith('[')) rawData = '[' + rawData + ']';
+                    
+                    const transcript = JSON.parse(rawData);
+                    
+                    // 1. FILTER: Only get 'user' role
+                    // 2. CLEAN: Ignore any message starting with '{' (system configs)
+                    const parentTexts = transcript
+                      .filter(item => item.role === 'user') 
+                      .map(item => item.message)
+                      .filter(msg => msg && !msg.trim().startsWith('{')); 
+                    
+                    if (parentTexts.length > 0) {
+                      summaryDisplay = parentTexts.join(' • ');
                     }
-                    
-                    const transcript = JSON.parse(rawSummary);
-                    const userMessages = transcript
-                      .filter(item => item.role === 'user')
-                      .map(item => item.message);
-                    
-                    summaryDisplay = userMessages.length > 0 
-                      ? userMessages.join(' • ') 
-                      : "No user messages found.";
                   } catch (e) {
-                    // If JSON parsing still fails, try a simple regex as a backup
-                    const matches = rawSummary.match(/"role":"user","message":"([^"]+)"/g);
+                    // Fallback: Regex to find parent messages if JSON is malformed
+                    const matches = rawData.match(/"role":"user","message":"([^"]+)"/g);
                     if (matches) {
-                      summaryDisplay = matches.map(m => m.split('"message":"')[1].replace('"', '')).join(' • ');
-                    } else {
-                      summaryDisplay = rawSummary.substring(0, 150) + "..."; // Show snippet if logic fails
+                      summaryDisplay = matches
+                        .map(m => m.split('"message":"')[1].replace('"', ''))
+                        .filter(txt => !txt.startsWith('{'))
+                        .join(' • ');
                     }
                   }
-                } else {
-                  summaryDisplay = rawSummary || "No summary provided.";
+                } else if (rawData && !rawData.startsWith('{')) {
+                  // If it's just plain text and not a config object
+                  summaryDisplay = rawData;
                 }
 
                 const row = '<tr class="hover:bg-slate-50 transition-colors">' +
