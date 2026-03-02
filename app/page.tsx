@@ -94,7 +94,8 @@ export default function Dashboard() {
     </main>
 
     <script>
-      const AIRTABLE_TOKEN = 'pat0B40Gf8fI9Y6Y6.76c7c00e6c66c66c66c66c66c66c66c66c66c66c66c66c66c66c66c66c66c66c'; 
+      // We will now look for the variable name rather than the secret itself
+      const AIRTABLE_TOKEN = "${process.env.NEXT_PUBLIC_AIRTABLE_TOKEN}"; 
       const AIRTABLE_BASE_ID = 'appy8XTZJNKIQ6S7W';
       const AIRTABLE_TABLE_ID = 'tblJGsNuJklpANEhw';
       const AIRTABLE_API_URL = "https://api.airtable.com/v0/" + AIRTABLE_BASE_ID + "/" + AIRTABLE_TABLE_ID;
@@ -102,6 +103,10 @@ export default function Dashboard() {
       function escapeHtml(v) { return String(v || '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[m])); }
 
       async function fetchLeads() {
+        if (!AIRTABLE_TOKEN || AIRTABLE_TOKEN === "undefined") {
+            console.error("Airtable Token missing in Environment Variables");
+            return;
+        }
         const bodyEl = document.getElementById('leads-body');
         try {
             const res = await fetch(AIRTABLE_API_URL, {
@@ -127,7 +132,7 @@ export default function Dashboard() {
             });
         } catch (e) {
             document.getElementById('error-state').classList.remove('hidden');
-            document.getElementById('error-state').textContent = "Connection Error. Check Airtable settings.";
+            document.getElementById('error-state').textContent = "Connection Error. Check Vercel Settings.";
         }
       }
 
