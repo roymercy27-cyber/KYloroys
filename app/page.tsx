@@ -82,7 +82,7 @@ export default function Dashboard() {
                 <th class="px-5 py-3 text-left">Parent Name</th>
                 <th class="px-5 py-3 text-left">Phone</th>
                 <th class="px-5 py-3 text-left">Grade</th>
-                <th class="px-5 py-3 text-left">AI Call Summary</th>
+                <th class="px-5 py-3 text-left">Parent Message (Cleaned)</th>
               </tr>
             </thead>
             <tbody id="leads-body" class="divide-y divide-slate-100"></tbody>
@@ -94,7 +94,6 @@ export default function Dashboard() {
     </main>
 
     <script>
-      // We will now look for the variable name rather than the secret itself
       const AIRTABLE_TOKEN = "${process.env.NEXT_PUBLIC_AIRTABLE_TOKEN}"; 
       const AIRTABLE_BASE_ID = 'appy8XTZJNKIQ6S7W';
       const AIRTABLE_TABLE_ID = 'tblJGsNuJklpANEhw';
@@ -103,10 +102,8 @@ export default function Dashboard() {
       function escapeHtml(v) { return String(v || '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[m])); }
 
       async function fetchLeads() {
-        if (!AIRTABLE_TOKEN || AIRTABLE_TOKEN === "undefined") {
-            console.error("Airtable Token missing in Environment Variables");
-            return;
-        }
+        if (!AIRTABLE_TOKEN || AIRTABLE_TOKEN === "undefined") return;
+        
         const bodyEl = document.getElementById('leads-body');
         try {
             const res = await fetch(AIRTABLE_API_URL, {
@@ -122,17 +119,42 @@ export default function Dashboard() {
 
             records.forEach(r => {
                 const f = r.fields;
+                
+                // --- CLEANER LOGIC ---
+                let summaryDisplay = "No transcript available.";
+                const rawSummary = f['Call Summary'] || '';
+
+                if (rawSummary.trim().startsWith('[') || rawSummary.trim().startsWith('{')) {
+                  try {
+                    const transcript = JSON.parse(rawSummary);
+                    if (Array.isArray(transcript)) {
+                      // Filters only for parent (user) messages and joins them
+                      const userMessages = transcript
+                        .filter(item => item.role === 'user')
+                        .map(item => item.message);
+                      
+                      summaryDisplay = userMessages.length > 0 
+                        ? userMessages.join(' • ') 
+                        : "No user messages found in transcript.";
+                    }
+                  } catch (e) {
+                    summaryDisplay = rawSummary; // Fallback if JSON is partial
+                  }
+                } else {
+                  summaryDisplay = rawSummary;
+                }
+
                 const row = '<tr class="hover:bg-slate-50">' +
                             '<td class="px-5 py-3 font-medium">' + escapeHtml(f['Parent Name']) + '</td>' +
-                            '<td class="px-5 py-3">' + escapeHtml(f['Parent Phone']) + '</td>' +
-                            '<td class="px-5 py-3"><span class="bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full text-xs">' + escapeHtml(f['Student Grade'] || '—') + '</span></td>' +
-                            '<td class="px-5 py-3 text-slate-600">' + escapeHtml(f['Call Summary'] || 'No summary available.') + '</td>' +
+                            '<td class="px-5 py-3 text-slate-500">' + escapeHtml(f['Parent Phone']) + '</td>' +
+                            '<td class="px-5 py-3"><span class="bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase">' + escapeHtml(f['Student Grade'] || '—') + '</span></td>' +
+                            '<td class="px-5 py-3 text-slate-600 text-xs leading-relaxed max-w-md">' + escapeHtml(summaryDisplay) + '</td>' +
                             '</tr>';
                 bodyEl.insertAdjacentHTML('beforeend', row);
             });
         } catch (e) {
             document.getElementById('error-state').classList.remove('hidden');
-            document.getElementById('error-state').textContent = "Connection Error. Check Vercel Settings.";
+            document.getElementById('error-state').textContent = "Connection Error.";
         }
       }
 
