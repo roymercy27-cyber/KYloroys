@@ -120,34 +120,42 @@ export default function Dashboard() {
             records.forEach(r => {
                 const f = r.fields;
                 
-                // --- CLEANER LOGIC ---
+                // --- ROBUST CLEANER LOGIC ---
                 let summaryDisplay = "No transcript available.";
-                const rawSummary = f['Call Summary'] || '';
+                let rawSummary = (f['Call Summary'] || '').trim();
 
-                if (rawSummary.trim().startsWith('[') || rawSummary.trim().startsWith('{')) {
+                if (rawSummary.includes('"role"')) {
                   try {
-                    const transcript = JSON.parse(rawSummary);
-                    if (Array.isArray(transcript)) {
-                      // Filters only for parent (user) messages and joins them
-                      const userMessages = transcript
-                        .filter(item => item.role === 'user')
-                        .map(item => item.message);
-                      
-                      summaryDisplay = userMessages.length > 0 
-                        ? userMessages.join(' • ') 
-                        : "No user messages found in transcript.";
+                    // Wrap in brackets if they are missing
+                    if (!rawSummary.startsWith('[')) {
+                      rawSummary = '[' + rawSummary + ']';
                     }
+                    
+                    const transcript = JSON.parse(rawSummary);
+                    const userMessages = transcript
+                      .filter(item => item.role === 'user')
+                      .map(item => item.message);
+                    
+                    summaryDisplay = userMessages.length > 0 
+                      ? userMessages.join(' • ') 
+                      : "No user messages found.";
                   } catch (e) {
-                    summaryDisplay = rawSummary; // Fallback if JSON is partial
+                    // If JSON parsing still fails, try a simple regex as a backup
+                    const matches = rawSummary.match(/"role":"user","message":"([^"]+)"/g);
+                    if (matches) {
+                      summaryDisplay = matches.map(m => m.split('"message":"')[1].replace('"', '')).join(' • ');
+                    } else {
+                      summaryDisplay = rawSummary.substring(0, 150) + "..."; // Show snippet if logic fails
+                    }
                   }
                 } else {
-                  summaryDisplay = rawSummary;
+                  summaryDisplay = rawSummary || "No summary provided.";
                 }
 
-                const row = '<tr class="hover:bg-slate-50">' +
-                            '<td class="px-5 py-3 font-medium">' + escapeHtml(f['Parent Name']) + '</td>' +
-                            '<td class="px-5 py-3 text-slate-500">' + escapeHtml(f['Parent Phone']) + '</td>' +
-                            '<td class="px-5 py-3"><span class="bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase">' + escapeHtml(f['Student Grade'] || '—') + '</span></td>' +
+                const row = '<tr class="hover:bg-slate-50 transition-colors">' +
+                            '<td class="px-5 py-3 font-semibold text-slate-800">' + escapeHtml(f['Parent Name']) + '</td>' +
+                            '<td class="px-5 py-3 text-slate-500 font-mono text-xs">' + escapeHtml(f['Parent Phone']) + '</td>' +
+                            '<td class="px-5 py-3"><span class="bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider">' + escapeHtml(f['Student Grade'] || '—') + '</span></td>' +
                             '<td class="px-5 py-3 text-slate-600 text-xs leading-relaxed max-w-md">' + escapeHtml(summaryDisplay) + '</td>' +
                             '</tr>';
                 bodyEl.insertAdjacentHTML('beforeend', row);
