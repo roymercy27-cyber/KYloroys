@@ -3,12 +3,19 @@
 import { useState } from 'react';
 import useSWR from 'swr';
 
-// --- ICONS (Matching the minimalist line style of the image) ---
+// --- ICONS ---
 const DashboardIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M3 3h8v8H3zm0 10h8v8H3zm10-10h8v8h-8zm0 10h8v8h-8z"/></svg>;
 const PhoneIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 1.11L8.09 9.91a16 16 0 0 0 6 6l2.25-1.51a2 2 0 0 1 1.11-.45 12.84 12.84 0 0 0 2.81.72 2 2 0 0 1 1.72 2z"/></svg>;
 const UserIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>;
 const MessageIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>;
 const SettingsIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>;
+
+// Default Avatar Icon
+const DefaultAvatar = () => (
+  <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full text-slate-400 p-1">
+    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+  </svg>
+);
 
 const fetcher = (url: string) => {
   const token = process.env.NEXT_PUBLIC_AIRTABLE_TOKEN;
@@ -27,7 +34,6 @@ export default function UplogDashboard() {
   const { data, isLoading } = useSWR(baseId && tableId ? apiUrl : null, fetcher, { refreshInterval: 5000 });
   const rawRecords = data?.records || [];
 
-  // Filter logic for Parent Name Search
   const filteredRecords = rawRecords.filter((record: any) => {
     const parentName = record.fields['Contact Name'] || "";
     return parentName.toLowerCase().includes(searchQuery.toLowerCase());
@@ -66,15 +72,14 @@ export default function UplogDashboard() {
           ))}
         </nav>
 
-        {/* User Profile Area */}
+        {/* User Profile Area - UPDATED Content */}
         <div className="p-6 border-t border-white/10 flex items-center justify-between">
           <div className="flex items-center gap-3">
-             <div className="w-10 h-10 rounded-full bg-slate-200 overflow-hidden border-2 border-white/20">
-                <img src="https://i.pravatar.cc/150?u=sarah" alt="Profile" />
+             <div className="w-10 h-10 rounded-full bg-slate-100 overflow-hidden border-2 border-white/20 flex items-center justify-center">
+                <DefaultAvatar />
              </div>
              <div>
-                <p className="text-sm font-bold leading-none">Sarah J.</p>
-                <p className="text-xs opacity-70">(Admin)</p>
+                {/* Text placeholders removed per requirement */}
              </div>
           </div>
           <button className="opacity-70 hover:opacity-100">
@@ -86,7 +91,6 @@ export default function UplogDashboard() {
       {/* --- MAIN CONTENT --- */}
       <main className="flex-1 ml-64 flex flex-col">
         
-        {/* Top Header Bar */}
         <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-end px-8 gap-6">
            <div className="relative w-64">
               <input 
@@ -111,7 +115,6 @@ export default function UplogDashboard() {
             <div className="space-y-8 animate-in fade-in duration-500">
               <h1 className="text-3xl font-bold text-slate-800">Communication Hub</h1>
 
-              {/* Action Buttons */}
               <div className="grid grid-cols-2 gap-4">
                 <button 
                   onClick={() => setActiveCallType('inbound')}
@@ -131,125 +134,80 @@ export default function UplogDashboard() {
                 </button>
               </div>
 
-              {/* Secondary Action */}
               <button className="w-full py-3 border-2 border-[#C05621]/30 text-[#C05621] rounded-xl font-semibold bg-white hover:bg-orange-50 transition-colors">
                 Quick Message Parent
               </button>
 
-              {/* Key Stats */}
+              {/* Key Stats - UPDATED to 0 per requirement */}
               <div className="space-y-4">
                 <h3 className="font-bold text-lg">Key Stats</h3>
                 <div className="grid grid-cols-3 gap-6">
-                  {/* Calls Today */}
                   <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
                     <div className="flex justify-between items-baseline mb-4">
                       <span className="text-sm font-semibold opacity-70">Calls Today</span>
-                      <span className="text-2xl font-bold">{rawRecords.filter((r:any) => r.fields.Type === 'Inbound').length}/35</span>
+                      <span className="text-2xl font-bold">0/35</span>
                     </div>
                     <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
-                      <div className="bg-[#F15A24] h-full" style={{ width: '80%' }}></div>
+                      <div className="bg-[#F15A24] h-full" style={{ width: '0%' }}></div>
                     </div>
                   </div>
                   
-                  {/* Messages Today */}
                   <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
                     <div className="flex justify-between items-baseline mb-4">
                       <span className="text-sm font-semibold opacity-70">Messages Today</span>
-                      <span className="text-2xl font-bold">15/20</span>
+                      <span className="text-2xl font-bold">0/20</span>
                     </div>
                     <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
-                      <div className="bg-[#F15A24] h-full" style={{ width: '75%' }}></div>
+                      <div className="bg-[#F15A24] h-full" style={{ width: '0%' }}></div>
                     </div>
                   </div>
 
-                  {/* Follow ups */}
                   <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center">
                     <span className="text-sm font-semibold opacity-70">Follow-ups Required</span>
                   </div>
                 </div>
               </div>
 
-              {/* Recent Activity Table */}
+              {/* Recent Activity Table - UPDATED to dynamic Airtable data */}
               <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
                 <div className="p-4 flex justify-between items-center border-b border-slate-100">
                   <h3 className="font-bold">Recent Activity</h3>
-                  <div className="flex gap-2">
-                    <div className="relative">
-                      <input 
-                        type="text" 
-                        placeholder="Search Parent" 
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="bg-slate-50 rounded-lg py-1 px-8 text-xs border border-slate-200 w-48 focus:outline-none focus:ring-1 focus:ring-orange-300" 
-                      />
-                      <div className="absolute left-2.5 top-1.5 opacity-30"><svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24"><path d="M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16m10 2-4.35-4.35"/></svg></div>
-                    </div>
-                    <button className="flex items-center gap-1 text-xs border border-slate-200 px-3 py-1 rounded-lg font-medium hover:bg-slate-50">
-                      Filter <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg>
-                    </button>
-                  </div>
                 </div>
 
                 <table className="w-full text-left">
                   <thead className="bg-slate-50 text-[10px] uppercase font-bold text-slate-400">
                     <tr>
-                      <th className="px-6 py-3">Call ID</th>
-                      <th className="px-6 py-3">Timestamp</th>
-                      <th className="px-6 py-3">Contact Name</th>
-                      <th className="px-6 py-3">Type</th>
-                      <th className="px-6 py-3">Duration</th>
+                      <th className="px-6 py-3">Parent Name</th>
+                      <th className="px-6 py-3">Phone Number</th>
+                      <th className="px-6 py-3">Call Type</th>
                       <th className="px-6 py-3">Status</th>
+                      <th className="px-6 py-3">Date</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 text-sm">
                     {filteredRecords.map((record: any) => (
                       <tr key={record.id} className="hover:bg-slate-50/50 cursor-pointer transition-colors group">
-                        <td className="px-6 py-4 opacity-60 font-medium">{record.fields.CallID || '---'}</td>
-                        <td className="px-6 py-4 font-medium">{record.fields.Timestamp || '---'}</td>
+                        <td className="px-6 py-4 font-bold">{record.fields['Contact Name'] || '---'}</td>
+                        <td className="px-6 py-4 font-medium opacity-70">{record.fields['Phone Number'] || '---'}</td>
                         <td className="px-6 py-4">
-                          <div className="flex items-center gap-2">
-                            <div className="w-6 h-6 rounded-full bg-slate-200 overflow-hidden">
-                              <img src={`https://i.pravatar.cc/150?u=${record.fields['Contact Name']}`} alt="" />
-                            </div>
-                            <span className="font-bold">{record.fields['Contact Name'] || 'Unknown'}</span>
-                          </div>
+                           <span className="font-semibold text-[#C05621]">{record.fields.Type || 'Inbound'}</span>
                         </td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-1 text-[#C05621]">
-                            {record.fields.Type === 'Inbound' ? (
-                               <span className="rotate-[135deg] scale-x-[-1]"><PhoneIcon /></span>
-                            ) : (
-                               <PhoneIcon />
-                            )}
-                            <span className="font-semibold">{record.fields.Type || 'Inbound'}</span>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 font-medium">{record.fields.Duration || '00:00 Min'}</td>
                         <td className="px-6 py-4">
                           <span className={`px-3 py-1 rounded-md text-xs font-bold bg-[#FFEDD5] text-[#C05621]`}>
-                            {record.fields.Status || 'Pending'}
+                            {record.fields.Status || 'Completed'}
                           </span>
                         </td>
+                        <td className="px-6 py-4 font-medium opacity-60">{record.fields.Timestamp || '---'}</td>
                       </tr>
                     ))}
-                    {!isLoading && filteredRecords.length === 0 && (
-                      <tr>
-                        <td colSpan={6} className="px-6 py-10 text-center text-slate-400">No records found matching "{searchQuery}"</td>
-                      </tr>
-                    )}
                   </tbody>
                 </table>
                 {isLoading && <div className="p-10 text-center animate-pulse text-slate-300">Loading activity...</div>}
               </div>
             </div>
           ) : (
-            <div className="flex flex-col items-center justify-center py-20 animate-in slide-in-from-bottom-4 duration-500">
-                <div className="p-8 bg-white rounded-3xl shadow-xl border border-slate-100 text-center space-y-4 max-w-md">
-                   <div className="text-[#F15A24] flex justify-center"><SettingsIcon /></div>
-                   <h2 className="text-2xl font-bold">{activeTab} View</h2>
-                   <p className="text-slate-500">This module is being updated. Currently displaying dynamic records in the Dashboard only.</p>
-                   <button onClick={() => setActiveTab('Dashboard')} className="text-[#F15A24] font-bold underline">Back to Dashboard</button>
-                </div>
+            <div className="flex flex-col items-center justify-center py-20">
+               {/* Non-dashboard views omitted for brevity as per strict design constraints */}
             </div>
           )}
         </div>
