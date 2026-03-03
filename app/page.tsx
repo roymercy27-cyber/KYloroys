@@ -17,13 +17,21 @@ const fetcher = (url: string) => {
 
 export default function UplogDashboard() {
   const [activeTab, setActiveTab] = useState('Dashboard');
+  const [activeCallType, setActiveCallType] = useState<'inbound' | 'outbound'>('inbound');
+  const [searchQuery, setSearchQuery] = useState('');
   
   const baseId = process.env.NEXT_PUBLIC_AIRTABLE_BASE_ID;
   const tableId = process.env.NEXT_PUBLIC_AIRTABLE_TABLE_ID;
   const apiUrl = `https://api.airtable.com/v0/${baseId}/${tableId}?sort[0][field]=Timestamp&sort[0][direction]=desc`;
 
   const { data, isLoading } = useSWR(baseId && tableId ? apiUrl : null, fetcher, { refreshInterval: 5000 });
-  const records = data?.records || [];
+  const rawRecords = data?.records || [];
+
+  // Filter logic for Parent Name Search
+  const filteredRecords = rawRecords.filter((record: any) => {
+    const parentName = record.fields['Contact Name'] || "";
+    return parentName.toLowerCase().includes(searchQuery.toLowerCase());
+  });
 
   return (
     <div className="flex min-h-screen bg-[#F8F9FB] text-slate-800 font-sans antialiased">
@@ -81,7 +89,13 @@ export default function UplogDashboard() {
         {/* Top Header Bar */}
         <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-end px-8 gap-6">
            <div className="relative w-64">
-              <input type="text" placeholder="Search" className="w-full bg-slate-100 rounded-full py-1.5 px-10 text-sm focus:outline-none" />
+              <input 
+                type="text" 
+                placeholder="Search" 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-slate-100 rounded-full py-1.5 px-10 text-sm focus:outline-none" 
+              />
               <div className="absolute left-3 top-2 opacity-30"><svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16m10 2-4.35-4.35"/></svg></div>
            </div>
            <div className="relative">
@@ -99,10 +113,20 @@ export default function UplogDashboard() {
 
               {/* Action Buttons */}
               <div className="grid grid-cols-2 gap-4">
-                <button className="flex items-center justify-center gap-2 py-4 border-2 border-[#C05621] text-[#C05621] rounded-xl font-bold hover:bg-orange-50 transition-colors">
+                <button 
+                  onClick={() => setActiveCallType('inbound')}
+                  className={`flex items-center justify-center gap-2 py-4 border-2 border-[#C05621] rounded-xl font-bold transition-all ${
+                    activeCallType === 'inbound' ? 'bg-[#F15A24] text-white' : 'text-[#C05621] hover:bg-orange-50'
+                  }`}
+                >
                   <span className="rotate-[135deg] scale-x-[-1]"><PhoneIcon /></span> Log Inbound Call
                 </button>
-                <button className="flex items-center justify-center gap-2 py-4 bg-[#F15A24] text-white rounded-xl font-bold shadow-lg shadow-orange-200 hover:brightness-110 transition-all">
+                <button 
+                  onClick={() => setActiveCallType('outbound')}
+                  className={`flex items-center justify-center gap-2 py-4 border-2 border-[#C05621] rounded-xl font-bold transition-all ${
+                    activeCallType === 'outbound' ? 'bg-[#F15A24] text-white shadow-lg shadow-orange-200' : 'text-[#C05621] hover:bg-orange-50'
+                  }`}
+                >
                   <PhoneIcon /> Start Outbound Call →
                 </button>
               </div>
@@ -120,7 +144,7 @@ export default function UplogDashboard() {
                   <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
                     <div className="flex justify-between items-baseline mb-4">
                       <span className="text-sm font-semibold opacity-70">Calls Today</span>
-                      <span className="text-2xl font-bold">{records.filter((r:any) => r.fields.Type === 'Inbound').length}/35</span>
+                      <span className="text-2xl font-bold">{rawRecords.filter((r:any) => r.fields.Type === 'Inbound').length}/35</span>
                     </div>
                     <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
                       <div className="bg-[#F15A24] h-full" style={{ width: '80%' }}></div>
@@ -151,7 +175,13 @@ export default function UplogDashboard() {
                   <h3 className="font-bold">Recent Activity</h3>
                   <div className="flex gap-2">
                     <div className="relative">
-                      <input type="text" placeholder="Search" className="bg-slate-50 rounded-lg py-1 px-8 text-xs border border-slate-200 w-48" />
+                      <input 
+                        type="text" 
+                        placeholder="Search Parent" 
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="bg-slate-50 rounded-lg py-1 px-8 text-xs border border-slate-200 w-48 focus:outline-none focus:ring-1 focus:ring-orange-300" 
+                      />
                       <div className="absolute left-2.5 top-1.5 opacity-30"><svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24"><path d="M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16m10 2-4.35-4.35"/></svg></div>
                     </div>
                     <button className="flex items-center gap-1 text-xs border border-slate-200 px-3 py-1 rounded-lg font-medium hover:bg-slate-50">
@@ -172,16 +202,16 @@ export default function UplogDashboard() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 text-sm">
-                    {records.map((record: any) => (
+                    {filteredRecords.map((record: any) => (
                       <tr key={record.id} className="hover:bg-slate-50/50 cursor-pointer transition-colors group">
-                        <td className="px-6 py-4 opacity-60 font-medium">{record.fields.CallID || '1123325'}</td>
-                        <td className="px-6 py-4 font-medium">{record.fields.Timestamp || 'Jun 24, 9:42 PM'}</td>
+                        <td className="px-6 py-4 opacity-60 font-medium">{record.fields.CallID || '---'}</td>
+                        <td className="px-6 py-4 font-medium">{record.fields.Timestamp || '---'}</td>
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-2">
                             <div className="w-6 h-6 rounded-full bg-slate-200 overflow-hidden">
                               <img src={`https://i.pravatar.cc/150?u=${record.fields['Contact Name']}`} alt="" />
                             </div>
-                            <span className="font-bold">{record.fields['Contact Name']}</span>
+                            <span className="font-bold">{record.fields['Contact Name'] || 'Unknown'}</span>
                           </div>
                         </td>
                         <td className="px-6 py-4">
@@ -194,25 +224,25 @@ export default function UplogDashboard() {
                             <span className="font-semibold">{record.fields.Type || 'Inbound'}</span>
                           </div>
                         </td>
-                        <td className="px-6 py-4 font-medium">{record.fields.Duration || '02:30 Min'}</td>
+                        <td className="px-6 py-4 font-medium">{record.fields.Duration || '00:00 Min'}</td>
                         <td className="px-6 py-4">
-                          <span className={`px-3 py-1 rounded-md text-xs font-bold ${
-                            record.fields.Status?.includes('Sent') 
-                            ? 'bg-[#FFEDD5] text-[#C05621]' 
-                            : 'bg-[#FFEDD5] text-[#C05621]'
-                          }`}>
-                            {record.fields.Status || 'Call Completed'}
+                          <span className={`px-3 py-1 rounded-md text-xs font-bold bg-[#FFEDD5] text-[#C05621]`}>
+                            {record.fields.Status || 'Pending'}
                           </span>
                         </td>
                       </tr>
                     ))}
+                    {!isLoading && filteredRecords.length === 0 && (
+                      <tr>
+                        <td colSpan={6} className="px-6 py-10 text-center text-slate-400">No records found matching "{searchQuery}"</td>
+                      </tr>
+                    )}
                   </tbody>
                 </table>
                 {isLoading && <div className="p-10 text-center animate-pulse text-slate-300">Loading activity...</div>}
               </div>
             </div>
           ) : (
-            /* --- PLACEHOLDER FOR OTHER SCREENS --- */
             <div className="flex flex-col items-center justify-center py-20 animate-in slide-in-from-bottom-4 duration-500">
                 <div className="p-8 bg-white rounded-3xl shadow-xl border border-slate-100 text-center space-y-4 max-w-md">
                    <div className="text-[#F15A24] flex justify-center"><SettingsIcon /></div>
