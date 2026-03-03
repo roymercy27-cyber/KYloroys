@@ -4,10 +4,11 @@ import { useState } from 'react';
 import useSWR from 'swr';
 
 // --- ICONS ---
-const SchoolIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 22v-4a2 2 0 1 0-4 0v4"/><path d="M18 10V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v6"/><path d="M18 10a2 2 0 1 1 0 4h-1v2a2 2 0 1 1 0 4H7a2 2 0 1 1 0-4V14a2 2 0 1 1 0-4H7Z"/></svg>;
+// Replaced generic SchoolIcon with your custom emblem image below in the component
 const LayoutGridIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>;
 const PhoneIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 1.11L8.09 9.91a16 16 0 0 0 6 6l2.25-1.51a2 2 0 0 1 1.11-.45 12.84 12.84 0 0 0 2.81.72 2 2 0 0 1 1.72 2z"/></svg>;
 const SettingsIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>;
+const ContactIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>;
 
 const fetcher = (url: string) => {
   const token = process.env.NEXT_PUBLIC_AIRTABLE_TOKEN;
@@ -28,39 +29,37 @@ export default function DashboardPage() {
   return (
     <div className="flex min-h-screen bg-slate-50 font-sans text-slate-900">
       
-      {/* SIDEBAR WITH KYLO ROYS EMBLEM */}
-      <aside className="fixed inset-y-0 left-0 w-64 bg-orange-500 text-white p-6 flex flex-col gap-6 shadow-2xl z-50">
+      {/* SIDEBAR */}
+      <aside className="fixed inset-y-0 left-0 w-64 bg-orange-600 text-white p-6 flex flex-col gap-6 shadow-2xl z-50">
         
-        {/* LOGO CONTAINER */}
+        {/* UPDATED LOGO CONTAINER WITH ACTUAL EMBLEM */}
         <div className="flex flex-col items-center mb-4">
-          <div className="bg-white rounded-2xl p-3 shadow-lg w-full">
+          <div className="bg-white rounded-2xl p-2 shadow-lg w-full aspect-square flex flex-col items-center justify-center">
             <img 
               src="/logo.png" 
-              alt="Kylo Roys Logo" 
-              className="w-full h-auto object-contain mx-auto"
-              onError={(e) => {
-                // Fallback if image isn't found in public folder
-                e.currentTarget.style.display = 'none';
-              }}
+              alt="Kylo Roys Emblem" 
+              className="w-4/5 h-4/5 object-contain"
+              /* Optional: Ensure you have your emblem saved as logo.png in the /public folder */
             />
-            {/* If the image fails to load, this text will show as a fallback */}
-            <p className="text-orange-600 text-center font-black text-xs uppercase tracking-tight mt-1">Kylo Roys</p>
           </div>
+          <p className="mt-3 text-white text-center font-black text-sm uppercase tracking-widest">Kylo Roys</p>
         </div>
 
         <nav className="flex flex-col gap-2">
-          {['Dashboard', 'Calls', 'Contacts', 'Settings'].map((tab) => (
-            <div 
-              key={tab}
-              onClick={() => { setActiveTab(tab); setView('main'); }}
-              className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all ${activeTab === tab ? 'bg-white/20 font-bold shadow-inner' : 'hover:bg-white/10'}`}
+          {[
+            { name: 'Dashboard', icon: <LayoutGridIcon /> },
+            { name: 'Calls', icon: <PhoneIcon /> },
+            { name: 'Contacts', icon: <ContactIcon /> },
+            { name: 'Settings', icon: <SettingsIcon /> }
+          ].map((item) => (
+            <button 
+              key={item.name}
+              onClick={() => { setActiveTab(item.name); setView('main'); }}
+              className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all w-full text-left ${activeTab === item.name ? 'bg-white/20 font-bold shadow-inner' : 'hover:bg-white/10'}`}
             >
-              {tab === 'Dashboard' && <LayoutGridIcon />}
-              {tab === 'Calls' && <PhoneIcon />}
-              {tab === 'Contacts' && <SchoolIcon />}
-              {tab === 'Settings' && <SettingsIcon />}
-              {tab}
-            </div>
+              {item.icon}
+              {item.name}
+            </button>
           ))}
         </nav>
       </aside>
@@ -106,7 +105,7 @@ export default function DashboardPage() {
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Calls Today</p>
                     <p className="text-4xl font-black">{records.length} <span className="text-slate-300">/ 35</span></p>
                     <div className="w-full bg-slate-100 h-3 mt-6 rounded-full overflow-hidden">
-                        <div className="bg-orange-500 h-full transition-all duration-1000" style={{ width: `${(records.length/35)*100}%` }}></div>
+                        <div className="bg-orange-500 h-full transition-all duration-1000" style={{ width: `${Math.min((records.length/35)*100, 100)}%` }}></div>
                     </div>
                   </div>
                   <div className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/50">
@@ -123,46 +122,54 @@ export default function DashboardPage() {
                 </div>
 
                 <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200 border border-slate-100 overflow-hidden">
-                  <div className="p-8 border-b border-slate-50 flex justify-between items-center">
+                  <div className="p-8 border-b border-slate-50">
                     <h2 className="text-2xl font-black">Recent Activity</h2>
                   </div>
-                  <table className="w-full text-left">
-                    <thead className="bg-slate-50/50 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
-                      <tr>
-                        <th className="px-10 py-5">Parent Name</th>
-                        <th className="px-10 py-5">Phone</th>
-                        <th className="px-10 py-5">Grade</th>
-                        <th className="px-10 py-5">AI Summary</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100">
-                      {records.map((r: any) => (
-                        <tr key={r.id} className="hover:bg-orange-50/30 transition-all cursor-default">
-                          <td className="px-10 py-6 font-extrabold text-slate-800">{r.fields['Parent Name']}</td>
-                          <td className="px-10 py-6 text-sm font-medium text-slate-400 italic">{r.fields['Parent Phone']}</td>
-                          <td className="px-10 py-6">
-                            <span className="px-3 py-1 bg-orange-100 text-orange-600 text-[10px] font-black rounded-lg uppercase">
-                              {r.fields['Student Grade']}
-                            </span>
-                          </td>
-                          <td className="px-10 py-6 text-xs text-slate-500 max-w-md leading-relaxed">
-                            {r.fields['Call Summary'] || "Lead captured. Sarah is analyzing the transcript..."}
-                          </td>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left">
+                      <thead className="bg-slate-50/50 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+                        <tr>
+                          <th className="px-10 py-5">Parent Name</th>
+                          <th className="px-10 py-5">Phone</th>
+                          <th className="px-10 py-5">Grade</th>
+                          <th className="px-10 py-5">AI Summary</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {records.map((r: any) => (
+                          <tr key={r.id} className="hover:bg-orange-50/30 transition-all cursor-default">
+                            <td className="px-10 py-6 font-extrabold text-slate-800">{r.fields['Parent Name']}</td>
+                            <td className="px-10 py-6 text-sm font-medium text-slate-400 italic">{r.fields['Parent Phone']}</td>
+                            <td className="px-10 py-6">
+                              <span className="px-3 py-1 bg-orange-100 text-orange-600 text-[10px] font-black rounded-lg uppercase">
+                                {r.fields['Student Grade']}
+                              </span>
+                            </td>
+                            <td className="px-10 py-6 text-xs text-slate-500 max-w-md leading-relaxed">
+                              {r.fields['Call Summary'] || "Lead captured. Sarah is analyzing the transcript..."}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </>
             )}
           </div>
         )}
 
-        {/* OTHER SCREENS */}
         {activeTab === 'Calls' && (
             <div className="bg-white p-20 rounded-[3rem] border border-slate-100 shadow-xl text-center">
                 <h2 className="text-2xl font-black mb-4">Inbound Call Logs</h2>
                 <p className="text-slate-400">Detailed call recordings and AI transcripts will appear here.</p>
+            </div>
+        )}
+
+        {activeTab === 'Contacts' && (
+            <div className="bg-white p-20 rounded-[3rem] border border-slate-100 shadow-xl text-center">
+                <h2 className="text-2xl font-black mb-4">Contact Management</h2>
+                <p className="text-slate-400">Manage your lead directory and parent information here.</p>
             </div>
         )}
 
