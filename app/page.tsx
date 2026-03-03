@@ -21,37 +21,28 @@ export default function UplogDashboard() {
   
   const baseId = process.env.NEXT_PUBLIC_AIRTABLE_BASE_ID;
   const tableId = process.env.NEXT_PUBLIC_AIRTABLE_TABLE_ID;
-  
-  // Use 'Grid view' by default to ensure we see the same thing as your screenshot
   const apiUrl = `https://api.airtable.com/v0/${baseId}/${tableId}?view=Grid%20view`;
 
-  const { data, isLoading, error } = useSWR(baseId && tableId ? apiUrl : null, fetcher, { refreshInterval: 5000 });
+  const { data, isLoading } = useSWR(baseId && tableId ? apiUrl : null, fetcher, { refreshInterval: 5000 });
 
-  const processedRecords = useMemo(() => {
+  const records = useMemo(() => {
     if (!data?.records) return [];
-    
-    return data.records.map((record: any) => ({
-      id: record.id,
-      // Mapping based on your screenshot!
-      name: record.fields['Parent Name'] || 'Unknown',
-      phone: record.fields['Parent Phone'] || 'No Phone',
-      grade: record.fields['Student Grade'] || 'N/A',
-      summary: record.fields['Call Summary'] || '',
-      // Fallbacks for fields not visible in your screenshot
-      type: record.fields['Type'] || 'Inbound', 
-      status: record.fields['Status'] || 'New Lead',
-      date: record.fields['Timestamp'] || new Date(record.createdTime).toLocaleDateString()
+    return data.records.map((r: any) => ({
+      id: r.id,
+      name: r.fields['Parent Name'] || '---',
+      phone: r.fields['Parent Phone'] || '---',
+      grade: r.fields['Student Grade'] || '---',
+      status: 'New Lead', // Defaulting as seen in earlier designs
+      date: new Date(r.createdTime).toLocaleDateString()
     }));
   }, [data]);
 
-  const filteredRecords = processedRecords.filter((r: any) => 
+  const filtered = records.filter((r: any) => 
     r.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
     <div className="flex min-h-screen bg-[#F8F9FB] text-slate-800 font-sans antialiased">
-      
-      {/* --- SIDEBAR --- */}
       <aside className="w-64 bg-[#F15A24] text-white flex flex-col fixed inset-y-0">
         <div className="p-6 flex items-center gap-2">
           <div className="bg-white p-1 rounded-md">
@@ -59,54 +50,66 @@ export default function UplogDashboard() {
           </div>
           <span className="text-2xl font-bold tracking-tight">Uplog</span>
         </div>
-
         <nav className="mt-4 flex-1">
           {['Dashboard', 'Calls', 'Contacts', 'Messages', 'Settings'].map((id) => (
-            <button
-              key={id}
-              onClick={() => setActiveTab(id)}
-              className={`w-full flex items-center gap-4 px-6 py-4 text-sm font-medium transition-colors ${
-                activeTab === id ? 'bg-black/10 border-l-4 border-white' : 'hover:bg-black/5 opacity-80'
-              }`}
-            >
-              {id === 'Dashboard' && <DashboardIcon />}
-              {id === 'Calls' && <PhoneIcon />}
-              {id === 'Contacts' && <UserIcon />}
-              {id === 'Messages' && <MessageIcon />}
-              {id === 'Settings' && <SettingsIcon />}
-              {id}
+            <button key={id} onClick={() => setActiveTab(id)} className={`w-full flex items-center gap-4 px-6 py-4 text-sm font-medium ${activeTab === id ? 'bg-black/10 border-l-4 border-white' : 'opacity-80'}`}>
+              {id === 'Dashboard' && <DashboardIcon />} {id === 'Calls' && <PhoneIcon />} {id === 'Contacts' && <UserIcon />} {id === 'Messages' && <MessageIcon />} {id === 'Settings' && <SettingsIcon />} {id}
             </button>
           ))}
         </nav>
       </aside>
 
-      {/* --- MAIN CONTENT --- */}
       <main className="flex-1 ml-64 flex flex-col">
         <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-end px-8 gap-6">
-           <div className="relative w-64">
-              <input 
-                type="text" 
-                placeholder="Search leads..." 
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-slate-100 rounded-full py-1.5 px-10 text-sm focus:outline-none" 
-              />
-           </div>
+           <input type="text" placeholder="Search..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="bg-slate-100 rounded-full py-1.5 px-6 text-sm focus:outline-none w-64" />
         </header>
 
-        <div className="p-8 max-w-7xl w-full mx-auto">
+        <div className="p-8 max-w-7xl w-full mx-auto space-y-8">
           {activeTab === 'Dashboard' ? (
-            <div className="space-y-8">
-              <div className="flex justify-between items-end">
-                <h1 className="text-3xl font-bold text-slate-800">Communication Hub</h1>
-                {error && <span className="text-red-500 text-xs font-mono">Connection Error!</span>}
+            <>
+              <h1 className="text-3xl font-bold">Communication Hub</h1>
+              
+              {/* --- RESTORED BUTTONS --- */}
+              <div className="grid grid-cols-2 gap-4">
+                <button className="flex items-center justify-center gap-2 py-4 border-2 border-[#C05621] rounded-xl font-bold text-[#C05621] hover:bg-orange-50 transition-all">
+                  <span className="rotate-[135deg] scale-x-[-1]"><PhoneIcon /></span> Log Inbound Call
+                </button>
+                <button className="flex items-center justify-center gap-2 py-4 border-2 border-[#C05621] rounded-xl font-bold bg-[#F15A24] text-white shadow-lg shadow-orange-100 hover:bg-[#d44d1d] transition-all">
+                  <PhoneIcon /> Start Outbound Call →
+                </button>
               </div>
 
-              {/* Activity Table */}
+              <button className="w-full py-3 border-2 border-[#C05621]/30 text-[#C05621] rounded-xl font-semibold bg-white hover:bg-orange-50 transition-colors">
+                Quick Message Parent
+              </button>
+
+              {/* --- RESTORED KEY STATS --- */}
+              <div className="space-y-4">
+                <h3 className="font-bold text-lg">Key Stats</h3>
+                <div className="grid grid-cols-3 gap-6">
+                  <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                    <div className="flex justify-between items-baseline mb-4">
+                      <span className="text-sm font-semibold opacity-70">Calls Today</span>
+                      <span className="text-2xl font-bold">0/35</span>
+                    </div>
+                    <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden"><div className="bg-[#F15A24] h-full w-0"></div></div>
+                  </div>
+                  <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                    <div className="flex justify-between items-baseline mb-4">
+                      <span className="text-sm font-semibold opacity-70">Messages Today</span>
+                      <span className="text-2xl font-bold">0/20</span>
+                    </div>
+                    <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden"><div className="bg-[#F15A24] h-full w-0"></div></div>
+                  </div>
+                  <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center"><span className="text-sm font-semibold opacity-70">Follow-ups Required</span></div>
+                </div>
+              </div>
+
+              {/* --- TABLE AREA --- */}
               <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
                 <div className="p-4 border-b border-slate-100 flex justify-between items-center">
                   <h3 className="font-bold">Recent Leads Activity</h3>
-                  <span className="text-xs bg-slate-100 px-2 py-1 rounded text-slate-500">Live Sync</span>
+                  {isLoading && <span className="text-xs text-orange-500 animate-pulse font-bold">Syncing...</span>}
                 </div>
                 <table className="w-full text-left">
                   <thead className="bg-slate-50 text-[10px] uppercase font-bold text-slate-400">
@@ -115,62 +118,32 @@ export default function UplogDashboard() {
                       <th className="px-6 py-3">Phone</th>
                       <th className="px-6 py-3">Grade</th>
                       <th className="px-6 py-3">Status</th>
-                      <th className="px-6 py-3">Last Active</th>
+                      <th className="px-6 py-3">Date</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 text-sm">
-                    {filteredRecords.map((record: any) => (
-                      <tr key={record.id} className="hover:bg-orange-50/30 transition-colors">
-                        <td className="px-6 py-4 font-bold text-slate-700">{record.name}</td>
-                        <td className="px-6 py-4 font-medium text-slate-500">{record.phone}</td>
-                        <td className="px-6 py-4">
-                          <span className="bg-blue-50 text-blue-600 px-2 py-0.5 rounded text-xs font-semibold uppercase">
-                            {record.grade}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4">
-                          <span className="px-3 py-1 rounded-md text-xs font-bold bg-orange-100 text-[#C05621]">
-                            {record.status}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 font-medium opacity-60">{record.date}</td>
+                    {filtered.map((r: any) => (
+                      <tr key={r.id} className="hover:bg-slate-50 transition-colors">
+                        <td className="px-6 py-4 font-bold">{r.name}</td>
+                        <td className="px-6 py-4 opacity-70">{r.phone}</td>
+                        <td className="px-6 py-4"><span className="bg-blue-50 text-blue-600 px-2 py-0.5 rounded text-xs font-bold">{r.grade}</span></td>
+                        <td className="px-6 py-4"><span className="px-3 py-1 rounded-md text-xs font-bold bg-orange-100 text-[#C05621]">{r.status}</span></td>
+                        <td className="px-6 py-4 opacity-60">{r.date}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
-
-                {isLoading && (
-                  <div className="p-12 text-center">
-                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-[#F15A24] border-t-transparent"></div>
-                    <p className="mt-4 text-slate-400 font-medium">Fetching from Airtable...</p>
-                  </div>
-                )}
-
-                {!isLoading && filteredRecords.length === 0 && (
-                  <div className="p-20 text-center">
-                    <p className="text-slate-400">No records found. Check if your Base ID and Table ID are correct.</p>
-                    <p className="text-[10px] text-slate-300 mt-2 font-mono">Base: {baseId} | Table: {tableId}</p>
+                {!isLoading && filtered.length === 0 && (
+                  <div className="p-10 text-center text-slate-400">
+                    No records found. Verify Base ID: <code className="text-[10px]">{baseId}</code>
                   </div>
                 )}
               </div>
-            </div>
+            </>
           ) : (
-            <div className="flex flex-col items-center justify-center py-20">
-               <div className="w-full max-w-md p-10 bg-white rounded-3xl shadow-xl border border-slate-100 text-center space-y-4">
-                  <div className="w-16 h-16 bg-orange-50 text-[#F15A24] rounded-full flex items-center justify-center mx-auto mb-4">
-                    <SettingsIcon />
-                  </div>
-                  <h2 className="text-2xl font-bold text-slate-800">{activeTab} View</h2>
-                  <p className="text-slate-500 text-sm leading-relaxed">
-                    The <strong>{activeTab}</strong> module is currently under maintenance. Please use the Dashboard to view live records.
-                  </p>
-                  <button 
-                    onClick={() => setActiveTab('Dashboard')}
-                    className="mt-4 px-6 py-2 bg-[#F15A24] text-white rounded-full font-bold hover:bg-[#d44d1d] transition-colors"
-                  >
-                    Return to Dashboard
-                  </button>
-               </div>
+            <div className="text-center py-20 bg-white rounded-3xl border shadow-sm">
+              <h2 className="text-2xl font-bold">{activeTab} View Under Update</h2>
+              <button onClick={() => setActiveTab('Dashboard')} className="text-[#F15A24] font-bold underline mt-4">Back to Dashboard</button>
             </div>
           )}
         </div>
