@@ -3,198 +3,226 @@
 import { useState } from 'react';
 import useSWR from 'swr';
 
-// --- ICONS (Styled to match design) ---
-const LayoutGridIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>;
-const PhoneIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 1.11L8.09 9.91a16 16 0 0 0 6 6l2.25-1.51a2 2 0 0 1 1.11-.45 12.84 12.84 0 0 0 2.81.72 2 2 0 0 1 1.72 2z"/></svg>;
-const UsersIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>;
-const SettingsIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>;
+// --- ICONS (Matching the minimalist line style of the image) ---
+const DashboardIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M3 3h8v8H3zm0 10h8v8H3zm10-10h8v8h-8zm0 10h8v8h-8z"/></svg>;
+const PhoneIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 1.11L8.09 9.91a16 16 0 0 0 6 6l2.25-1.51a2 2 0 0 1 1.11-.45 12.84 12.84 0 0 0 2.81.72 2 2 0 0 1 1.72 2z"/></svg>;
+const UserIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>;
+const MessageIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>;
+const SettingsIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>;
 
 const fetcher = (url: string) => {
   const token = process.env.NEXT_PUBLIC_AIRTABLE_TOKEN;
   return fetch(url, { headers: { Authorization: `Bearer ${token}` } }).then((res) => res.json());
 };
 
-export default function DashboardPage() {
+export default function UplogDashboard() {
   const [activeTab, setActiveTab] = useState('Dashboard');
-  const [view, setView] = useState('main'); 
-
+  
   const baseId = process.env.NEXT_PUBLIC_AIRTABLE_BASE_ID;
   const tableId = process.env.NEXT_PUBLIC_AIRTABLE_TABLE_ID;
-  const apiUrl = `https://api.airtable.com/v0/${baseId}/${tableId}`;
+  const apiUrl = `https://api.airtable.com/v0/${baseId}/${tableId}?sort[0][field]=Timestamp&sort[0][direction]=desc`;
 
   const { data, isLoading } = useSWR(baseId && tableId ? apiUrl : null, fetcher, { refreshInterval: 5000 });
   const records = data?.records || [];
 
   return (
-    <div className="flex min-h-screen bg-[#F9FAFB] font-sans text-slate-900 antialiased">
+    <div className="flex min-h-screen bg-[#F8F9FB] text-slate-800 font-sans antialiased">
       
-      {/* SIDEBAR */}
-      <aside className="fixed inset-y-0 left-0 w-64 bg-white border-r border-slate-200 p-6 flex flex-col gap-10 z-50">
-        <div className="flex items-center gap-3 text-2xl font-black uppercase tracking-tighter text-[#EA580C]">
-          <div className="bg-[#EA580C] text-white p-2 rounded-xl shadow-lg shadow-orange-200">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      {/* --- SIDEBAR --- */}
+      <aside className="w-64 bg-[#F15A24] text-white flex flex-col fixed inset-y-0">
+        <div className="p-6 flex items-center gap-2">
+          <div className="bg-white p-1 rounded-md">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="#F15A24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
           </div>
-          Uplog
+          <span className="text-2xl font-bold tracking-tight">Uplog</span>
         </div>
 
-        <nav className="flex flex-col gap-2">
+        <nav className="mt-4 flex-1">
           {[
-            { id: 'Dashboard', icon: <LayoutGridIcon />, label: 'Dashboard' },
+            { id: 'Dashboard', icon: <DashboardIcon />, label: 'Dashboard' },
             { id: 'Calls', icon: <PhoneIcon />, label: 'Calls' },
-            { id: 'Contacts', icon: <UsersIcon />, label: 'Contacts' },
+            { id: 'Contacts', icon: <UserIcon />, label: 'Contacts' },
+            { id: 'Messages', icon: <MessageIcon />, label: 'Messages' },
             { id: 'Settings', icon: <SettingsIcon />, label: 'Settings' },
           ].map((item) => (
-            <div 
+            <button
               key={item.id}
-              onClick={() => { setActiveTab(item.id); setView('main'); }}
-              className={`flex items-center gap-4 p-4 rounded-2xl cursor-pointer transition-all font-bold ${activeTab === item.id ? 'bg-[#EA580C] text-white shadow-lg shadow-orange-100' : 'text-slate-500 hover:bg-slate-50'}`}
+              onClick={() => setActiveTab(item.id)}
+              className={`w-full flex items-center gap-4 px-6 py-4 text-sm font-medium transition-colors ${
+                activeTab === item.id ? 'bg-black/10 border-l-4 border-white' : 'hover:bg-black/5 opacity-80'
+              }`}
             >
               {item.icon}
               {item.label}
-            </div>
+            </button>
           ))}
         </nav>
+
+        {/* User Profile Area */}
+        <div className="p-6 border-t border-white/10 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+             <div className="w-10 h-10 rounded-full bg-slate-200 overflow-hidden border-2 border-white/20">
+                <img src="https://i.pravatar.cc/150?u=sarah" alt="Profile" />
+             </div>
+             <div>
+                <p className="text-sm font-bold leading-none">Sarah J.</p>
+                <p className="text-xs opacity-70">(Admin)</p>
+             </div>
+          </div>
+          <button className="opacity-70 hover:opacity-100">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4m7 14l5-5-5-5m5 5H9"/></svg>
+          </button>
+        </div>
       </aside>
 
-      {/* MAIN CONTENT */}
-      <main className="flex-1 ml-64 p-12">
-        <header className="mb-12 flex justify-between items-end">
-            <div>
-                <h1 className="text-5xl font-black tracking-tight text-slate-900">Communication Hub</h1>
-                <p className="text-slate-500 font-medium mt-2">Manage your school inbound and outbound leads.</p>
-            </div>
-            <div className="px-5 py-2.5 bg-emerald-50 text-emerald-600 rounded-full text-xs font-black uppercase tracking-[0.15em] border border-emerald-100 shadow-sm flex items-center gap-2">
-                <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-                Live Sync Active
-            </div>
+      {/* --- MAIN CONTENT --- */}
+      <main className="flex-1 ml-64 flex flex-col">
+        
+        {/* Top Header Bar */}
+        <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-end px-8 gap-6">
+           <div className="relative w-64">
+              <input type="text" placeholder="Search" className="w-full bg-slate-100 rounded-full py-1.5 px-10 text-sm focus:outline-none" />
+              <div className="absolute left-3 top-2 opacity-30"><svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16m10 2-4.35-4.35"/></svg></div>
+           </div>
+           <div className="relative">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="opacity-60"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              <span className="absolute -top-1 -right-1 bg-[#F15A24] text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">1</span>
+           </div>
+           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="opacity-60"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01"/></svg>
         </header>
 
-        {activeTab === 'Dashboard' && (
-          <div className="space-y-12">
-            
-            {/* ACTION BUTTONS */}
-            <div className="grid grid-cols-2 gap-8">
-              <button 
-                onClick={() => setView('main')}
-                className="flex items-center justify-center gap-4 h-24 bg-white border-2 border-[#EA580C] text-[#EA580C] rounded-[2rem] font-black text-xl hover:bg-orange-50 transition-all shadow-xl shadow-orange-500/5"
-              >
-                <PhoneIcon /> Log Inbound Call
-              </button>
-              <button 
-                onClick={() => setView('outbound_call')}
-                className="flex items-center justify-center gap-4 h-24 bg-[#EA580C] text-white rounded-[2rem] font-black text-xl shadow-2xl shadow-orange-200 hover:scale-[1.02] active:scale-95 transition-all"
-              >
-                Start Outbound Call →
-              </button>
-            </div>
+        <div className="p-8 max-w-7xl w-full mx-auto">
+          
+          {activeTab === 'Dashboard' ? (
+            <div className="space-y-8 animate-in fade-in duration-500">
+              <h1 className="text-3xl font-bold text-slate-800">Communication Hub</h1>
 
-            {/* Quick Message Bar */}
-            <div className="w-full bg-white border border-slate-200 p-6 rounded-3xl text-center text-[#C05621] font-bold text-lg shadow-sm cursor-pointer hover:border-[#EA580C] transition-colors">
-                Quick Message Parent
-            </div>
-
-            {view === 'outbound_call' ? (
-              <div className="bg-white p-24 rounded-[3.5rem] border-4 border-dashed border-slate-100 text-center space-y-6">
-                <div className="bg-slate-50 w-24 h-24 rounded-full flex items-center justify-center mx-auto text-slate-300">
-                    <PhoneIcon />
-                </div>
-                <h2 className="text-4xl font-black text-slate-300 tracking-tight">0 Outbound Calls</h2>
-                <p className="text-slate-400 max-w-sm mx-auto font-medium">Vapi Outbound triggers have not been configured for this environment yet.</p>
-                <button onClick={() => setView('main')} className="text-[#EA580C] font-black text-lg underline decoration-2 underline-offset-8">Return to Dashboard</button>
+              {/* Action Buttons */}
+              <div className="grid grid-cols-2 gap-4">
+                <button className="flex items-center justify-center gap-2 py-4 border-2 border-[#C05621] text-[#C05621] rounded-xl font-bold hover:bg-orange-50 transition-colors">
+                  <span className="rotate-[135deg] scale-x-[-1]"><PhoneIcon /></span> Log Inbound Call
+                </button>
+                <button className="flex items-center justify-center gap-2 py-4 bg-[#F15A24] text-white rounded-xl font-bold shadow-lg shadow-orange-200 hover:brightness-110 transition-all">
+                  <PhoneIcon /> Start Outbound Call →
+                </button>
               </div>
-            ) : (
-              <>
-                {/* STATS */}
-                <div className="grid grid-cols-3 gap-8">
-                  <div className="bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/30">
-                    <p className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-4">Calls Today</p>
-                    <p className="text-5xl font-black text-slate-900">{records.length} <span className="text-slate-200 text-3xl">/ 35</span></p>
-                    <div className="w-full bg-slate-50 h-4 mt-8 rounded-full overflow-hidden">
-                        <div className="bg-[#EA580C] h-full transition-all duration-1000" style={{ width: `${(records.length/35)*100}%` }}></div>
+
+              {/* Secondary Action */}
+              <button className="w-full py-3 border-2 border-[#C05621]/30 text-[#C05621] rounded-xl font-semibold bg-white hover:bg-orange-50 transition-colors">
+                Quick Message Parent
+              </button>
+
+              {/* Key Stats */}
+              <div className="space-y-4">
+                <h3 className="font-bold text-lg">Key Stats</h3>
+                <div className="grid grid-cols-3 gap-6">
+                  {/* Calls Today */}
+                  <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                    <div className="flex justify-between items-baseline mb-4">
+                      <span className="text-sm font-semibold opacity-70">Calls Today</span>
+                      <span className="text-2xl font-bold">{records.filter((r:any) => r.fields.Type === 'Inbound').length}/35</span>
+                    </div>
+                    <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                      <div className="bg-[#F15A24] h-full" style={{ width: '80%' }}></div>
                     </div>
                   </div>
                   
-                  <div className="bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/30">
-                    <p className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-4">Success Rate</p>
-                    <p className="text-5xl font-black text-slate-900">92%</p>
-                    <div className="w-full bg-slate-50 h-4 mt-8 rounded-full overflow-hidden">
-                        <div className="bg-emerald-500 h-full w-[92%]"></div>
+                  {/* Messages Today */}
+                  <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                    <div className="flex justify-between items-baseline mb-4">
+                      <span className="text-sm font-semibold opacity-70">Messages Today</span>
+                      <span className="text-2xl font-bold">15/20</span>
+                    </div>
+                    <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                      <div className="bg-[#F15A24] h-full" style={{ width: '75%' }}></div>
                     </div>
                   </div>
 
-                  <div className="bg-[#FFF7ED] p-10 rounded-[2.5rem] border border-[#FFEDD5] flex flex-col justify-center">
-                    <p className="text-xs font-black text-[#EA580C] uppercase tracking-[0.2em] mb-3 italic">Sarah AI Status</p>
-                    <p className="font-bold text-[#7C2D12] text-lg leading-snug italic">"Sarah is currently booking tours for the upcoming semester via phone."</p>
+                  {/* Follow ups */}
+                  <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center">
+                    <span className="text-sm font-semibold opacity-70">Follow-ups Required</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Recent Activity Table */}
+              <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <div className="p-4 flex justify-between items-center border-b border-slate-100">
+                  <h3 className="font-bold">Recent Activity</h3>
+                  <div className="flex gap-2">
+                    <div className="relative">
+                      <input type="text" placeholder="Search" className="bg-slate-50 rounded-lg py-1 px-8 text-xs border border-slate-200 w-48" />
+                      <div className="absolute left-2.5 top-1.5 opacity-30"><svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24"><path d="M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16m10 2-4.35-4.35"/></svg></div>
+                    </div>
+                    <button className="flex items-center gap-1 text-xs border border-slate-200 px-3 py-1 rounded-lg font-medium hover:bg-slate-50">
+                      Filter <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg>
+                    </button>
                   </div>
                 </div>
 
-                {/* TABLE */}
-                <div className="bg-white rounded-[3rem] shadow-2xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
-                  <div className="p-10 border-b border-slate-50 flex justify-between items-center">
-                    <h2 className="text-3xl font-black tracking-tight">Recent Activity</h2>
-                  </div>
-                  <table className="w-full text-left border-collapse">
-                    <thead className="bg-slate-50/50 text-[11px] font-black uppercase tracking-[0.2em] text-slate-400">
-                      <tr>
-                        <th className="px-10 py-6 text-center w-20">#</th>
-                        <th className="px-6 py-6">Parent Name</th>
-                        <th className="px-6 py-6">Phone Number</th>
-                        <th className="px-6 py-6">Student Grade</th>
-                        <th className="px-10 py-6">AI Summary</th>
+                <table className="w-full text-left">
+                  <thead className="bg-slate-50 text-[10px] uppercase font-bold text-slate-400">
+                    <tr>
+                      <th className="px-6 py-3">Call ID</th>
+                      <th className="px-6 py-3">Timestamp</th>
+                      <th className="px-6 py-3">Contact Name</th>
+                      <th className="px-6 py-3">Type</th>
+                      <th className="px-6 py-3">Duration</th>
+                      <th className="px-6 py-3">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 text-sm">
+                    {records.map((record: any) => (
+                      <tr key={record.id} className="hover:bg-slate-50/50 cursor-pointer transition-colors group">
+                        <td className="px-6 py-4 opacity-60 font-medium">{record.fields.CallID || '1123325'}</td>
+                        <td className="px-6 py-4 font-medium">{record.fields.Timestamp || 'Jun 24, 9:42 PM'}</td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-2">
+                            <div className="w-6 h-6 rounded-full bg-slate-200 overflow-hidden">
+                              <img src={`https://i.pravatar.cc/150?u=${record.fields['Contact Name']}`} alt="" />
+                            </div>
+                            <span className="font-bold">{record.fields['Contact Name']}</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-1 text-[#C05621]">
+                            {record.fields.Type === 'Inbound' ? (
+                               <span className="rotate-[135deg] scale-x-[-1]"><PhoneIcon /></span>
+                            ) : (
+                               <PhoneIcon />
+                            )}
+                            <span className="font-semibold">{record.fields.Type || 'Inbound'}</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 font-medium">{record.fields.Duration || '02:30 Min'}</td>
+                        <td className="px-6 py-4">
+                          <span className={`px-3 py-1 rounded-md text-xs font-bold ${
+                            record.fields.Status?.includes('Sent') 
+                            ? 'bg-[#FFEDD5] text-[#C05621]' 
+                            : 'bg-[#FFEDD5] text-[#C05621]'
+                          }`}>
+                            {record.fields.Status || 'Call Completed'}
+                          </span>
+                        </td>
                       </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100">
-                      {records.map((r: any, idx: number) => (
-                        <tr key={r.id} className="hover:bg-orange-50/30 transition-all group">
-                          <td className="px-10 py-8 text-center font-bold text-slate-300">{idx + 1}</td>
-                          <td className="px-6 py-8 font-black text-slate-900 text-lg">{r.fields['Parent Name']}</td>
-                          <td className="px-6 py-8 text-slate-400 font-bold italic">{r.fields['Parent Phone']}</td>
-                          <td className="px-6 py-8">
-                            <span className="px-4 py-2 bg-[#FFEDD5] text-[#EA580C] text-xs font-black rounded-full uppercase tracking-tighter shadow-sm">
-                              {r.fields['Student Grade']}
-                            </span>
-                          </td>
-                          <td className="px-10 py-8 text-sm text-slate-500 max-w-md leading-relaxed italic font-medium">
-                            {r.fields['Call Summary'] || "Sarah is processing the transcript..."}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                  {isLoading && (
-                    <div className="p-20 text-center font-black text-slate-200 text-3xl animate-pulse">
-                        SYNCING DATABASE...
-                    </div>
-                  )}
-                </div>
-              </>
-            )}
-          </div>
-        )}
-
-        {/* OTHER SCREENS */}
-        {activeTab === 'Calls' && (
-            <div className="bg-white p-24 rounded-[3rem] border border-slate-100 shadow-xl text-center space-y-4">
-                <h2 className="text-3xl font-black">Inbound Call Logs</h2>
-                <p className="text-slate-400 font-medium">Detailed call recordings and AI transcripts will appear here shortly.</p>
+                    ))}
+                  </tbody>
+                </table>
+                {isLoading && <div className="p-10 text-center animate-pulse text-slate-300">Loading activity...</div>}
+              </div>
             </div>
-        )}
-
-        {activeTab === 'Settings' && (
-            <div className="bg-white p-12 rounded-[3rem] border border-slate-100 shadow-xl">
-                <h2 className="text-3xl font-black mb-10 underline decoration-[#EA580C] underline-offset-[12px] decoration-4">System Configuration</h2>
-                <div className="space-y-6 max-w-md">
-                    <div className="p-6 bg-slate-50 rounded-[1.5rem] flex justify-between items-center border border-slate-100">
-                        <span className="font-black text-lg text-slate-700">Airtable Sync</span>
-                        <span className="bg-emerald-100 text-emerald-600 px-4 py-1 rounded-full font-black text-xs tracking-widest">ACTIVE</span>
-                    </div>
-                    <div className="p-6 bg-slate-50 rounded-[1.5rem] flex justify-between items-center border border-slate-100">
-                        <span className="font-black text-lg text-slate-700">AI Voice (Sarah)</span>
-                        <span className="bg-emerald-100 text-emerald-600 px-4 py-1 rounded-full font-black text-xs tracking-widest">READY</span>
-                    </div>
+          ) : (
+            /* --- PLACEHOLDER FOR OTHER SCREENS --- */
+            <div className="flex flex-col items-center justify-center py-20 animate-in slide-in-from-bottom-4 duration-500">
+                <div className="p-8 bg-white rounded-3xl shadow-xl border border-slate-100 text-center space-y-4 max-w-md">
+                   <div className="text-[#F15A24] flex justify-center"><SettingsIcon /></div>
+                   <h2 className="text-2xl font-bold">{activeTab} View</h2>
+                   <p className="text-slate-500">This module is being updated. Currently displaying dynamic records in the Dashboard only.</p>
+                   <button onClick={() => setActiveTab('Dashboard')} className="text-[#F15A24] font-bold underline">Back to Dashboard</button>
                 </div>
             </div>
-        )}
+          )}
+        </div>
       </main>
     </div>
   );
